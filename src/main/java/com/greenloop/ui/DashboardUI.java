@@ -44,7 +44,7 @@ public class DashboardUI extends JFrame {
             };
 
     public DashboardUI() {
-        setTitle("GreenLoop — Dashboard");
+        setTitle("GreenLoop - Dashboard");
         setSize(980, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -89,13 +89,14 @@ public class DashboardUI extends JFrame {
         panel.add(sep);
         panel.add(Box.createVerticalStrut(20));
 
-        // Nav items: label → action
+        // Nav items: label -> action
         String[][] navItems = {
                 {"Dashboard",        null},
                 {"Products",          "products"},
                 {"Clients",           "clients"},
                 {"Inventory",         "inventory"},
                 {"Delivery Agents",   "agents"},
+                {"Reports",           "reports"},
                 {"Email Notify",      "email"},
         };
 
@@ -180,7 +181,7 @@ public class DashboardUI extends JFrame {
         title.setForeground(TEXT);
         title.setFont(new Font("Segoe UI", Font.BOLD, 26));
 
-        lastRefreshLabel = new JLabel("Last updated: —");
+        lastRefreshLabel = new JLabel("Last updated: -");
         lastRefreshLabel.setForeground(MUTED);
         lastRefreshLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
@@ -205,10 +206,10 @@ public class DashboardUI extends JFrame {
         kpiRow.setBackground(BG);
         kpiRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 110));
 
-        productsVal  = new JLabel("—");
-        clientsVal   = new JLabel("—");
-        agentsVal    = new JLabel("—");
-        lowStockVal  = new JLabel("—");
+        productsVal  = new JLabel("-");
+        clientsVal   = new JLabel("-");
+        agentsVal    = new JLabel("-");
+        lowStockVal  = new JLabel("-");
 
         kpiRow.add(buildKpiCard("Products",        productsVal, "in catalogue",   GREEN));
         kpiRow.add(buildKpiCard("Clients",         clientsVal,  "registered",     GREEN));
@@ -350,7 +351,7 @@ public class DashboardUI extends JFrame {
             // Refresh low stock table
             lowStockModel.setRowCount(0);
             if (lowStock.isEmpty()) {
-                lowStockModel.addRow(new Object[]{"—", "—", "—", "All stock levels OK"});
+                lowStockModel.addRow(new Object[]{"-", "-", "-", "All stock levels OK"});
             } else {
                 for (Inventory i : lowStock) {
                     lowStockModel.addRow(new Object[]{
@@ -374,7 +375,7 @@ public class DashboardUI extends JFrame {
         }
     }
 
-    //  NAVIGATION — opens each module as a standalone JFrame
+    //  NAVIGATION - opens each module as a standalone JFrame
     private void openModule(String module) {
         SwingUtilities.invokeLater(() -> {
             switch (module) {
@@ -382,6 +383,7 @@ public class DashboardUI extends JFrame {
                 case "clients"   -> new ClientUI().setVisible(true);
                 case "inventory" -> new InventoryUI().setVisible(true);
                 case "agents"    -> new DeliveryAgentUI().setVisible(true);
+                case "reports"   -> new ReportsUI().setVisible(true);
                 // case "email"  -> new ClientDispatchEmailPanel().setVisible(true); // uncomment after merge
                 case "email"     -> JOptionPane.showMessageDialog(this,
                         "Email Notifications module coming after Thilini's PR is merged.",
