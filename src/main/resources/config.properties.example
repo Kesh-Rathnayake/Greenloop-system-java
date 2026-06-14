@@ -1,0 +1,8 @@
+db.url=jdbc:mysql://localhost:3306/greenloop
+db.username=root
+db.password=
+
+mail.host=smtp.gmail.com
+mail.port=587
+mail.username=your_email@gmail.com
+mail.password=your_gmail_app_password
