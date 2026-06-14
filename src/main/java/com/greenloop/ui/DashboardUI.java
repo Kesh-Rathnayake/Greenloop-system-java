@@ -384,10 +384,7 @@ public class DashboardUI extends JFrame {
                 case "inventory" -> new InventoryUI().setVisible(true);
                 case "agents"    -> new DeliveryAgentUI().setVisible(true);
                 case "reports"   -> new ReportsUI().setVisible(true);
-                // case "email"  -> new ClientDispatchEmailPanel().setVisible(true); // uncomment after merge
-                case "email"     -> JOptionPane.showMessageDialog(this,
-                        "Email Notifications module coming after Thilini's PR is merged.",
-                        "Not yet available", JOptionPane.INFORMATION_MESSAGE);
+                case "email"     -> new ClientDispatchEmailPanel().setVisible(true);
                 default          -> {}
             }
         });
