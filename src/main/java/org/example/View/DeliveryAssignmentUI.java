@@ -21,14 +21,6 @@ public class DeliveryAssignmentUI extends JFrame {
     private JTable ordersTable;
     private JComboBox<Agent> agentsComboBox;
     private JButton assignButton;
-    private JButton dashboardButton;
-    private JButton productsButton;
-    private JButton clientsButton;
-    private JButton inventoryButton;
-    private JButton agentsButton;
-    private JButton ordersButton;
-    private JButton deliveriesButton;
-    private JButton reportsButton;
     private JButton filterButton;
     private JButton assignOrdersButton;
     private JList agentsList;
@@ -54,10 +46,6 @@ public class DeliveryAssignmentUI extends JFrame {
         setContentPane(mainPanel);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         pack();
-
-        deliveriesButton.setBackground(new Color(16, 185, 129, 40));
-        deliveriesButton.setForeground(new Color(16, 185, 129));
-        deliveriesButton.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, new Color(16, 185, 129)));
 
         agentsComboBox = (JComboBox<Agent>) comboBox2;
         assignButton = assignDeliveryButton;
@@ -95,17 +83,8 @@ public class DeliveryAssignmentUI extends JFrame {
                 if (searchText.isEmpty()) {
                     tableSorter.setRowFilter(null);
                 } else {
-                    // filter by Order ID
                     tableSorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText, 0));
                 }
-            }
-        });
-        deliveriesButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadPendingOrders();
-                loadMetrics();
-                loadAgents();
             }
         });
     }
@@ -128,51 +107,37 @@ public class DeliveryAssignmentUI extends JFrame {
     }
 
     private void styleDateTimePicker() {
-        // set background and foreground colours for the text fields
         dateTimePicker.getDatePicker().getComponentDateTextField().setBackground(new Color(26, 26, 26));
         dateTimePicker.getDatePicker().getComponentDateTextField().setForeground(Color.WHITE);
         dateTimePicker.getTimePicker().getComponentTimeTextField().setBackground(new Color(26, 26, 26));
         dateTimePicker.getTimePicker().getComponentTimeTextField().setForeground(Color.WHITE);
-        // change button colours
         dateTimePicker.getDatePicker().getComponentToggleCalendarButton().setBackground(new Color(54, 54, 54));
         dateTimePicker.getTimePicker().getComponentToggleTimeMenuButton().setBackground(new Color(54, 54, 54));
     }
 
     private void createUIComponents() {
         brandLabel = new JLabel();
-
         java.net.URL imgURL = getClass().getResource("/logoImg/logo.jpg");
         if (imgURL != null) {
             ImageIcon icon = new ImageIcon(imgURL);
-
             Image scaledImage = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
             brandLabel.setIcon(new ImageIcon(scaledImage));
             brandLabel.setText("GreenLoop");
             brandLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
             brandLabel.setIconTextGap(8);
         } else {
-            System.err.println("Image not found: /logoImg/logo.png");
             brandLabel.setIcon(null);
             brandLabel.setText("🌿 GreenLoop");
         }
     }
 
     private void setupDateTimePicker() {
-        // date format
         dateTimePicker.datePicker.getSettings().setFormatForDatesCommonEra("yyyy-MM-dd");
         dateTimePicker.datePicker.getSettings().setFormatForDatesBeforeCommonEra("yyyy-MM-dd");
-
-        // time format
         dateTimePicker.timePicker.getSettings().setFormatForDisplayTime("HH:mm");
         dateTimePicker.timePicker.getSettings().setFormatForMenuTimes("HH:mm");
-
-        // set an initial value
         dateTimePicker.setDateTimeStrict(LocalDateTime.now());
-
-        // prevent empty time
         dateTimePicker.timePicker.getSettings().setAllowEmptyTimes(false);
-
-        // apply dark theme styling
         styleDateTimePicker();
     }
 
@@ -183,14 +148,11 @@ public class DeliveryAssignmentUI extends JFrame {
             for (Agent a : agents) {
                 agentsComboBox.addItem(a);
             }
-
-            // populate JList
             agentsListModel = new DefaultListModel<>();
             for (Agent a : agents) {
                 agentsListModel.addElement(a);
             }
             agentsList.setModel(agentsListModel);
-
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Failed to load agents");
@@ -225,17 +187,12 @@ public class DeliveryAssignmentUI extends JFrame {
     private void assignOrder() {
         String orderId = null;
         Agent agent = (Agent) agentsComboBox.getSelectedItem();
-
-        // try to get the selected order from the quick assign dropdown
         if (comboBox1.getSelectedIndex() != -1 && comboBox1.getSelectedItem() != null) {
             String selectedDisplay = (String) comboBox1.getSelectedItem();
-            // extract orderId from display string
             if (selectedDisplay != null && selectedDisplay.contains(" - ")) {
                 orderId = selectedDisplay.split(" - ")[0];
             }
         }
-
-        // if nothing selected in dropdown, try the table selection
         if (orderId == null) {
             int selectedRow = ordersTable.getSelectedRow();
             if (selectedRow == -1) {
@@ -244,26 +201,23 @@ public class DeliveryAssignmentUI extends JFrame {
             }
             orderId = (String) tableModel.getValueAt(selectedRow, 0);
         }
-
         if (agent == null) {
             JOptionPane.showMessageDialog(this, "Select an agent");
             return;
         }
-
         LocalDateTime scheduled = dateTimePicker.getDateTimeStrict();
         if (scheduled == null) {
             JOptionPane.showMessageDialog(this, "Please select a valid date and time");
             return;
         }
-
         try {
             boolean success = deliveryController.assignOrder(orderId, agent.getId(), scheduled);
             if (success) {
                 JOptionPane.showMessageDialog(this, "Assigned successfully");
-                loadPendingOrders(); // refresh table
-                loadQuickAssignOrders(); // refresh dropdown
-                loadAgents(); // refresh agent lists
-                loadMetrics(); // refresh metrics panels
+                loadPendingOrders();
+                loadQuickAssignOrders();
+                loadAgents();
+                loadMetrics();
             } else {
                 JOptionPane.showMessageDialog(this, "Assignment failed");
             }
@@ -273,7 +227,6 @@ public class DeliveryAssignmentUI extends JFrame {
         }
     }
 
-    // Custom list cell renderer for agents list
     class AgentListRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,
@@ -281,7 +234,6 @@ public class DeliveryAssignmentUI extends JFrame {
             JPanel panel = new JPanel(new BorderLayout(8, 0));
             panel.setBackground(isSelected ? new Color(42, 42, 42) : new Color(36, 36, 36));
             panel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-
             JLabel avatar = new JLabel("👤");
             avatar.setOpaque(true);
             avatar.setBackground(new Color(16, 185, 129));
@@ -290,29 +242,22 @@ public class DeliveryAssignmentUI extends JFrame {
             avatar.setHorizontalAlignment(SwingConstants.CENTER);
             avatar.setPreferredSize(new Dimension(28, 28));
             avatar.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
             JPanel textPanel = new JPanel(new GridLayout(2, 1));
             textPanel.setBackground(null);
-
             Agent agent = (Agent) value;
             JLabel nameLabel = new JLabel(agent.getName());
             nameLabel.setForeground(Color.WHITE);
             nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-
-            // Show real agent details if available, otherwise fallback text
             String details = agent.getVehicleType() + " • " + agent.getServiceArea() + " • " + agent.getPhone() + " • " +
-                             agent.getCurrentOrders() + " orders";
+                    agent.getCurrentOrders() + " orders";
             JLabel detailsLabel = new JLabel(details);
             detailsLabel.setForeground(new Color(102, 102, 102));
             detailsLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-
             textPanel.add(nameLabel);
             textPanel.add(detailsLabel);
-
             JLabel statusDot = new JLabel("●");
-            statusDot.setForeground(new Color(16, 185, 129)); // green for available
+            statusDot.setForeground(new Color(16, 185, 129));
             statusDot.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-
             panel.add(avatar, BorderLayout.WEST);
             panel.add(textPanel, BorderLayout.CENTER);
             panel.add(statusDot, BorderLayout.EAST);
@@ -328,7 +273,6 @@ public class DeliveryAssignmentUI extends JFrame {
                 String display = o.getOrderId() + " - " + o.getClientName();
                 comboBox1.addItem(display);
             }
-            // Store orders in a map or list for later retrieval
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Failed to load orders for quick assign");
