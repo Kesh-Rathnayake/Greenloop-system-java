@@ -31,4 +31,9 @@ public class Order {
     public double getAmount() { return amount; }
     public String getStatus() { return status; }
     public String getDeliveryAddress() { return deliveryAddress; }
+
+    // Add this field
+    private java.sql.Timestamp createdAt;
+
+    public java.sql.Timestamp getCreatedAt() { return createdAt; }
 }
